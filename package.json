@@ -12,5 +12,12 @@
   "type": "commonjs",
   "devDependencies": {
     "electron": "^42.3.3"
+  },
+  "dependencies": {
+    "@jitsi/robotjs": "^0.6.22",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.3"
   }
 }
