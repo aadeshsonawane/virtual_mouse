@@ -19,7 +19,6 @@ app.whenReady().then(() => {
   mainWindow.loadURL('http://localhost:5173')
 })
 
-// React कडून commands येतात
 ipcMain.on('move-mouse', (event, { x, y }) => {
   robot.moveMouse(x, y)
 })
