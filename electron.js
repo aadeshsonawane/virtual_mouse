@@ -1,22 +1,44 @@
+'use strict'
+
 const { app, BrowserWindow, ipcMain } = require('electron')
 const robot = require('@jitsi/robotjs')
 const path = require('path')
+
+app.commandLine.appendSwitch('disable-gpu')
+app.commandLine.appendSwitch('no-sandbox')
+app.commandLine.appendSwitch('disable-dev-shm-usage')
+app.commandLine.appendSwitch('disable-setuid-sandbox')
+
+app.commandLine.appendSwitch('enable-usermedia-screen-capturing')  // ← हे add कर
+app.commandLine.appendSwitch('allow-file-access-from-files')  // ← हे add 
 
 let mainWindow
 
 app.whenReady().then(() => {
   mainWindow = new BrowserWindow({
-    width: 400,
-    height: 300,
+    width: 900,
+    height: 700,
     alwaysOnTop: true,
     webPreferences: {
       nodeIntegration: false,
+      sandbox: false,  
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     }
   })
 
-  mainWindow.loadURL('http://localhost:5173')
+   mainWindow.webContents.session.setPermissionRequestHandler(
+    (webContents, permission, callback) => {
+      if (permission === 'media') {
+        callback(true)  // Allow camera!
+      } else {
+        callback(false)
+      }
+    }
+  )
+
+  mainWindow.loadURL('http://localhost:5174')
+  mainWindow.webContents.openDevTools()
 })
 
 ipcMain.on('move-mouse', (event, { x, y }) => {
