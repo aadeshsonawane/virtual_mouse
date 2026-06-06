@@ -50,7 +50,7 @@ const WebcamView = () => {
 
     // ☝️ Index only = MOVE
     if (fingers[1] === 1 && fingers[2] === 0 && fingers[3] === 0) {
-      
+       const x = Math.round(landmarks[8].x * screenW);
       const y = Math.round(landmarks[8].y * screenH);
       socket.emit("move-mouse", { x, y });
       setGesture("Moving 🖱️");

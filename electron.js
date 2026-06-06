@@ -9,8 +9,8 @@ app.commandLine.appendSwitch('no-sandbox')
 app.commandLine.appendSwitch('disable-dev-shm-usage')
 app.commandLine.appendSwitch('disable-setuid-sandbox')
 
-app.commandLine.appendSwitch('enable-usermedia-screen-capturing')  // ← हे add कर
-app.commandLine.appendSwitch('allow-file-access-from-files')  // ← हे add 
+app.commandLine.appendSwitch('enable-usermedia-screen-capturing')
+app.commandLine.appendSwitch('allow-file-access-from-files')
 
 let mainWindow
 
@@ -30,7 +30,7 @@ app.whenReady().then(() => {
    mainWindow.webContents.session.setPermissionRequestHandler(
     (webContents, permission, callback) => {
       if (permission === 'media') {
-        callback(true)  // Allow camera!
+        callback(true)
       } else {
         callback(false)
       }
