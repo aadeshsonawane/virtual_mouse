@@ -15,6 +15,8 @@ const WebcamView = () => {
   const screenW = window.screen.width;
   const screenH = window.screen.height;
 
+  
+
   useEffect(() => {
     socket.on("connect", () => setConnected(true));
     socket.on("disconnect", () => setConnected(false));
@@ -49,21 +51,27 @@ const WebcamView = () => {
     });
 
     // ☝️ Index only = MOVE
-    if (fingers[1] === 1 && fingers[2] === 0 && fingers[3] === 0) {
-      const rawX = 1 - landmarks[8].x;
+if (fingers[1] === 1 && fingers[2] === 0 && fingers[3] === 0) {
+  const smoothX = useRef(0);
+const smoothY = useRef(0);
+  const rawX =landmarks[8].x;
+  console.log(`Raw X: ${rawX.toFixed(2)}`)
+
   const rawY = landmarks[8].y;
-  console.log(`Raw Y: ${rawY.toFixed(3)}`)
 
-  
-  const x = Math.round(((rawX - 0.3) / 0.4) * screenW);
-  const y = Math.round(((rawY - 0.1) / 0.2) * screenH);
+  const x = Math.round(((rawX - 0.1) / 0.8) * screenW);
+  const y = Math.round(((rawY - 0.18) / 0.18) * screenH);
 
-  const clampedX = Math.max(0, Math.min(x, screenW - 1));
-  const clampedY = Math.max(0, Math.min(y, screenH - 1));
+  // Smoothing — 0.2 smooth, 0.5 fast
+ smoothX.current = smoothX.current + (targetX - smoothX.current) * 0.3;
+  smoothY.current = smoothY.current + (targetY - smoothY.current) * 0.3;
+
+  const clampedX = Math.max(0, Math.min(Math.round(smoothX.current), screenW - 1));
+  const clampedY = Math.max(0, Math.min(Math.round(smoothY.current), screenH - 1));
 
   socket.emit("move-mouse", { x: clampedX, y: clampedY });
   setGesture("Moving 🖱️");
-    }
+}
 
     // 🤏 Thumb + Index pinch = LEFT CLICK
     const leftPinch = getDistance(landmarks[4], landmarks[8]);
