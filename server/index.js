@@ -17,7 +17,7 @@ io.on('connection', (socket) => {
 
   socket.on('move-mouse', ({ x, y }) => {
     const flippedX = 1366 - x
-    console.log(`Moving to X: ${x} Y: ${y}`) 
+    // console.log(`Moving to X: ${x} Y: ${y}`) 
      robot.moveMouse(1366 - x, y) 
   })
 

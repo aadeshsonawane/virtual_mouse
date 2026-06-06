@@ -50,10 +50,19 @@ const WebcamView = () => {
 
     // ☝️ Index only = MOVE
     if (fingers[1] === 1 && fingers[2] === 0 && fingers[3] === 0) {
-       const x = Math.round(landmarks[8].x * screenW);
-      const y = Math.round(landmarks[8].y * screenH);
-      socket.emit("move-mouse", { x, y });
-      setGesture("Moving 🖱️");
+      const rawX = 1 - landmarks[8].x;
+  const rawY = landmarks[8].y;
+  console.log(`Raw Y: ${rawY.toFixed(3)}`)
+
+  
+  const x = Math.round(((rawX - 0.3) / 0.4) * screenW);
+  const y = Math.round(((rawY - 0.1) / 0.2) * screenH);
+
+  const clampedX = Math.max(0, Math.min(x, screenW - 1));
+  const clampedY = Math.max(0, Math.min(y, screenH - 1));
+
+  socket.emit("move-mouse", { x: clampedX, y: clampedY });
+  setGesture("Moving 🖱️");
     }
 
     // 🤏 Thumb + Index pinch = LEFT CLICK
@@ -129,26 +138,26 @@ const WebcamView = () => {
   }, []);
 
   return (
-    <div style={{ position: "relative", width: 640, height: 480 }}>
+    <div style={{ position: "relative", width: 900, height: 480, border: "2px solid red" }}>
       <video
         ref={videoRef}
-        style={{ width: 640, height: 480, transform: "scaleX(-1)" }}
+        style={{ width: 900, height: 480, transform: "scaleX(-1)" }}
         autoPlay
         muted
       />
       <canvas
         ref={canvasRef}
         width={640}
-        height={480}
+        height={490}
         style={{ position: "absolute", top: 0, left: 0 }}
       />
       <div style={{
         position: "absolute", bottom: 10, left: 10,
-        background: "rgba(0,0,0,0.6)",
+        background: "rgba(214, 27, 27, 0.6)",
         color: connected ? "#00ff00" : "#ff0000",
         padding: "8px 16px", borderRadius: 8, fontSize: 18,
       }}>
-        {connected ? "🟢 Connected" : "🔴 Disconnected"} | {gesture}
+        {connected ? "Connected" : "Disconnected"} | {gesture}
       </div>
     </div>
   );

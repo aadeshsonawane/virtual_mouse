@@ -11,19 +11,19 @@ function App() {
       padding: 20
     }}>
       <h1 style={{ color: "#00ff00", marginBottom: 20 }}>
-        🖱️ Virtual Mouse
+        Virtual Mouse
       </h1>
 
       <WebcamView />
 
-      {/* Gesture Guide */}
+  
       <div style={{
         marginTop: 20,
         background: "#2a2a2a",
         borderRadius: 12,
         padding: 16,
         color: "white",
-        width: 640
+        width: 900
       }}>
         <h3 style={{ color: "#00ff00" }}>Gesture Guide</h3>
         <p>☝️ Index finger up → Mouse Move</p>
