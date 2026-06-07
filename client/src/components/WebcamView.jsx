@@ -10,12 +10,12 @@ const WebcamView = () => {
   const [connected, setConnected] = useState(false);
   const clickCounter = useRef(0);
   const lastScrollTime = useRef(0);
+  const smoothX = useRef(0);
+  const smoothY = useRef(0);
   const CLICK_FRAMES = 5;
   const SCROLL_DELAY = 150;
   const screenW = window.screen.width;
   const screenH = window.screen.height;
-
-  
 
   useEffect(() => {
     socket.on("connect", () => setConnected(true));
@@ -51,40 +51,35 @@ const WebcamView = () => {
     });
 
     // ☝️ Index only = MOVE
-if (fingers[1] === 1 && fingers[2] === 0 && fingers[3] === 0) {
-  const smoothX = useRef(0);
-const smoothY = useRef(0);
-  const rawX =landmarks[8].x;
-  console.log(`Raw X: ${rawX.toFixed(2)}`)
+    if (fingers[1] === 1 && fingers[2] === 0 && fingers[3] === 0) {
+      const rawX = landmarks[8].x;
+      const rawY = landmarks[8].y;
 
-  const rawY = landmarks[8].y;
+      const targetX = Math.round(((rawX - 1.2) / 0.8) * screenW);
+      const targetY = Math.round(((rawY - 0.25) / 0.18) * screenH);
 
-  const x = Math.round(((rawX - 0.1) / 0.8) * screenW);
-  const y = Math.round(((rawY - 0.18) / 0.18) * screenH);
+      smoothX.current = smoothX.current + (targetX - smoothX.current) * 0.15;
+      smoothY.current = smoothY.current + (targetY - smoothY.current) * 0.15;
 
-  // Smoothing — 0.2 smooth, 0.5 fast
- smoothX.current = smoothX.current + (targetX - smoothX.current) * 0.3;
-  smoothY.current = smoothY.current + (targetY - smoothY.current) * 0.3;
+      const clampedX = Math.max(0, Math.min(Math.round(smoothX.current), screenW - 1));
+      const clampedY = Math.max(0, Math.min(Math.round(smoothY.current), screenH - 1));
 
-  const clampedX = Math.max(0, Math.min(Math.round(smoothX.current), screenW - 1));
-  const clampedY = Math.max(0, Math.min(Math.round(smoothY.current), screenH - 1));
+      socket.emit("move-mouse", { x: clampedX, y: clampedY });
+      setGesture("Moving");
+    }
 
-  socket.emit("move-mouse", { x: clampedX, y: clampedY });
-  setGesture("Moving 🖱️");
-}
-
-    // 🤏 Thumb + Index pinch = LEFT CLICK
+    // 🤏 Pinch = LEFT CLICK
     const leftPinch = getDistance(landmarks[4], landmarks[8]);
     if (leftPinch < 0.05) {
       clickCounter.current += 1;
-      setGesture(`Left Click soon... ${clickCounter.current}/${CLICK_FRAMES}`);
+      setGesture(`Click soon... ${clickCounter.current}/${CLICK_FRAMES}`);
     } else {
       clickCounter.current = 0;
     }
     if (clickCounter.current === CLICK_FRAMES) {
       socket.emit("click-mouse");
       clickCounter.current = 0;
-      setGesture("Left Clicked! 🖱️");
+      setGesture("Left Clicked!");
     }
 
     // 🤙 Thumb + Pinky = RIGHT CLICK
@@ -93,19 +88,19 @@ const smoothY = useRef(0);
         fingers[1] === 0 && fingers[2] === 0 && fingers[3] === 0 &&
         rightPinch < 0.08) {
       socket.emit("right-click");
-      setGesture("Right Clicked! 🖱️");
+      setGesture("Right Clicked!");
     }
 
-    // ✌️ Index + Middle = SCROLL (throttled)
+    // ✌️ Index + Middle = SCROLL
     if (fingers[1] === 1 && fingers[2] === 1 && fingers[3] === 0) {
       const now = Date.now();
       if (now - lastScrollTime.current > SCROLL_DELAY) {
         if (landmarks[8].y < 0.4) {
           socket.emit("scroll", { direction: "up" });
-          setGesture("Scrolling Up ⬆️");
+          setGesture("Scrolling Up ");
         } else if (landmarks[8].y > 0.6) {
           socket.emit("scroll", { direction: "down" });
-          setGesture("Scrolling Down ⬇️");
+          setGesture("Scrolling Down");
         }
         lastScrollTime.current = now;
       }
@@ -117,21 +112,17 @@ const smoothY = useRef(0);
       .getUserMedia({ video: { width: 640, height: 480 } })
       .then((stream) => {
         videoRef.current.srcObject = stream;
-
         const hands = new window.Hands({
           locateFile: (file) =>
             `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${file}`,
         });
-
         hands.setOptions({
           maxNumHands: 1,
           modelComplexity: 1,
           minDetectionConfidence: 0.85,
           minTrackingConfidence: 0.85,
         });
-
         hands.onResults(onResults);
-
         const camera = new window.Camera(videoRef.current, {
           onFrame: async () => {
             await hands.send({ image: videoRef.current });
@@ -139,29 +130,28 @@ const smoothY = useRef(0);
           width: 640,
           height: 480,
         });
-
         camera.start();
       })
       .catch((err) => alert("Webcam error: " + err.message));
   }, []);
 
   return (
-    <div style={{ position: "relative", width: 900, height: 480, border: "2px solid red" }}>
+    <div style={{ position: "relative", width: 640, height: 480 }}>
       <video
         ref={videoRef}
-        style={{ width: 900, height: 480, transform: "scaleX(-1)" }}
+        style={{ width: 640, height: 480, transform: "scaleX(-1)" }}
         autoPlay
         muted
       />
       <canvas
         ref={canvasRef}
         width={640}
-        height={490}
+        height={480}
         style={{ position: "absolute", top: 0, left: 0 }}
       />
       <div style={{
         position: "absolute", bottom: 10, left: 10,
-        background: "rgba(214, 27, 27, 0.6)",
+        background: "rgba(0,0,0,0.6)",
         color: connected ? "#00ff00" : "#ff0000",
         padding: "8px 16px", borderRadius: 8, fontSize: 18,
       }}>
