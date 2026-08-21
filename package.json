@@ -3,17 +3,20 @@
   "version": "1.0.0",
   "description": "",
   "main": "electron.js",
-  "scripts": {
+    "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "electron": "electron .",
+    "electron": "npx wait-on http://localhost:5173 && electron .",
     "server": "node server/index.js",
-    "dev": "nodemon index.js"
+    "client": "npm run dev --prefix client",
+    "start": "concurrently \"npm run server\" \"npm run client\" \"npm run electron\""
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "concurrently": "^10.0.5",
     "electron": "^42.3.3"
   },
   "dependencies": {

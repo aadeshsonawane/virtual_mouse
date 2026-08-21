@@ -4,10 +4,13 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const robot = require('@jitsi/robotjs')
 const path = require('path')
 
-// Enable WebGL & GPU Features
+// Background Throttling Disable Switches (Window Minimize Fix)
 app.commandLine.appendSwitch('ignore-gpu-blocklist')
 app.commandLine.appendSwitch('enable-gpu-rasterization')
 app.commandLine.appendSwitch('enable-webgl')
+app.commandLine.appendSwitch('disable-background-timer-throttling')
+app.commandLine.appendSwitch('disable-backgrounding-occluded-windows')
+app.commandLine.appendSwitch('disable-renderer-backgrounding')
 app.commandLine.appendSwitch('no-sandbox')
 app.commandLine.appendSwitch('disable-dev-shm-usage')
 app.commandLine.appendSwitch('disable-setuid-sandbox')
@@ -26,6 +29,7 @@ app.whenReady().then(() => {
       nodeIntegration: false,
       sandbox: false,  
       contextIsolation: true,
+      backgroundThrottling: false,
       webgl: true,
       experimentalFeatures: true,
       preload: path.join(__dirname, 'preload.js')

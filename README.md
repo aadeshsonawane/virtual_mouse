@@ -69,24 +69,33 @@ virtual_mouse/
 
 ## 🎮 How to Run
 
-Running the app requires **2 steps** (or 3 if using Electron):
+### 🚀 Single Command Launch (Recommended)
+
+Run everything (Backend Server, React Client, and Electron Desktop Window) simultaneously in **a single terminal command**:
+
+```bash
+npm start
+```
+> This automatically starts the backend server on `http://localhost:3001`, boots up the Vite dev server on `http://localhost:5173`, and launches the Electron desktop app seamlessly!
+
+---
+
+### 🛠️ Alternative: Manual Step-by-Step Launch
+
+If you want to run services individually across multiple terminals:
 
 #### Step 1: Start Backend Mouse Server (Terminal 1)
 ```bash
-node server/index.js
-# Or using npm script:
 npm run server
 ```
-> Server runs on `http://localhost:3001` and listens for mouse control Socket events.
 
 #### Step 2: Start Client Dev Server (Terminal 2)
 ```bash
 cd client
 npm run dev
 ```
-> Open `http://localhost:5173` in your web browser and allow webcam access.
 
-#### Step 3 (Optional): Launch Electron Desktop Window (Terminal 3)
+#### Step 3: Launch Electron Desktop Window (Terminal 3)
 ```bash
 npm run electron
 ```

@@ -22,7 +22,6 @@ const WebcamView = () => {
   const screenH = window.screen.height;
 
     useEffect(() => {
-    // Check if socket is already connected before component mounted
     if (socket.connected) {
       setConnected(true);
     }
@@ -74,7 +73,6 @@ const WebcamView = () => {
       const rawX = landmarks[8].x;
       const rawY = landmarks[8].y;
 
-      // Active Box Range: camera ki (0.15 se 0.85) position ko full screen par map karne ke liye
       const activeMin = 0.15;
       const activeMax = 0.85;
 
@@ -175,7 +173,7 @@ const WebcamView = () => {
         ref={canvasRef}
         width={640}
         height={480}
-        style={{ position: "absolute", top: 0, left: 0 }}
+        style={{ position: "absolute", top: 0, left: 0,transform: "scaleX(-1)" }}
       />
       <div style={{
         position: "absolute", bottom: 10, left: 10,
