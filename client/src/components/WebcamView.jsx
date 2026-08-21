@@ -51,15 +51,23 @@ const WebcamView = () => {
     });
 
     // ☝️ Index only = MOVE
-    if (fingers[1] === 1 && fingers[2] === 0 && fingers[3] === 0) {
+        // ☝️ Index finger up = MOVE
+    if (fingers[1] === 1 && fingers[2] === 0) {
       const rawX = landmarks[8].x;
       const rawY = landmarks[8].y;
 
-      const targetX = Math.round(((rawX - 1.2) / 0.8) * screenW);
-      const targetY = Math.round(((rawY - 0.25) / 0.18) * screenH);
+      // Active Box Range: camera ki (0.15 se 0.85) position ko full screen par map karne ke liye
+      const activeMin = 0.15;
+      const activeMax = 0.85;
 
-      smoothX.current = smoothX.current + (targetX - smoothX.current) * 0.15;
-      smoothY.current = smoothY.current + (targetY - smoothY.current) * 0.15;
+      const normX = ((1 - rawX) - activeMin) / (activeMax - activeMin);
+      const normY = (rawY - activeMin) / (activeMax - activeMin);
+
+      const targetX = Math.round(normX * screenW);
+      const targetY = Math.round(normY * screenH);
+
+      smoothX.current = smoothX.current + (targetX - smoothX.current) * 0.25;
+      smoothY.current = smoothY.current + (targetY - smoothY.current) * 0.25;
 
       const clampedX = Math.max(0, Math.min(Math.round(smoothX.current), screenW - 1));
       const clampedY = Math.max(0, Math.min(Math.round(smoothY.current), screenH - 1));
@@ -67,6 +75,7 @@ const WebcamView = () => {
       socket.emit("move-mouse", { x: clampedX, y: clampedY });
       setGesture("Moving");
     }
+
 
     // 🤏 Pinch = LEFT CLICK
     const leftPinch = getDistance(landmarks[4], landmarks[8]);
