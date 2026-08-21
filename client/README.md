@@ -1,16 +1,78 @@
-# React + Vite
+🖱️ AI Virtual Mouse Control System
+An AI-powered, gesture-controlled virtual mouse system that tracks your hand movements via webcam using MediaPipe Hands, React (Vite), Socket.IO, and Node.js (RobotJS) to control your computer's OS-level mouse cursor in real-time.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+✨ Features
+☝️ Smooth Cursor Movement: Move your index finger to float the cursor smoothly across the screen (equipped with active bounding box mapping and exponential smoothing).
+🤏 Left Click: Pinch your Index finger and Thumb together.
+🤙 Right Click: Extend your Thumb and Pinky finger.
+✌️ Mouse Scroll: Raise your Index and Middle fingers together and move Up/Down to scroll pages.
+⚡ Low-Latency Communication: Real-time Socket.IO WebSockets bridge between webcam gesture detection and system-level mouse actions.
+🖥️ Cross-Platform / Desktop Friendly: Operates seamlessly in standard browsers and via Electron Desktop wrapper.
+🛠️ Tech Stack
+Frontend: React 19, Vite, MediaPipe Hands (@mediapipe/hands), Socket.IO-Client
+Backend: Node.js, Express, Socket.IO Server, @jitsi/robotjs
+Desktop Window (Optional): Electron 42
 
-Currently, two official plugins are available:
+📁 Project Structure
+text
+virtual_mouse/
+├── client/                   # React + Vite Frontend
+│   ├── src/
+│   │   ├── components/
+│   │   │   └── WebcamView.jsx # MediaPipe Tracking & Gesture Detection logic
+│   │   ├── App.jsx           # Main React component
+│   │   └── main.jsx
+│   ├── index.html            # MediaPipe CDN imports & DOM root
+│   └── package.json
+├── server/                   # Node.js + Express Backend
+│   └── index.js              # Socket.IO event listeners & RobotJS mouse triggers
+├── electron.js               # Desktop Electron Window configuration
+├── preload.js                # Electron IPC bridge
+└── package.json              # Root project dependencies & scripts
+ Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Prerequisites
+Node.js (v18 or higher)
+Working Webcam
+Linux / Windows / macOS OS
+2. Installation
+Install Root & Server Dependencies:
 
-## React Compiler
+bash
+npm install
+Install Client Dependencies:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+bash
+cd client
+npm install
+cd ..
+🎮 How to Run
+Running the app requires 2 steps (or 3 if using Electron):
 
-## Expanding the ESLint configuration
+Step 1: Start Backend Mouse Server (Terminal 1)
+bash
+node server/index.js
+# Or using npm script:
+npm run server
+Server runs on http://localhost:3001 and listens for mouse control Socket events.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Step 2: Start Client Dev Server (Terminal 2)
+bash
+cd client
+npm run dev
+Open http://localhost:5173 in your web browser and allow webcam access.
+
+Step 3 (Optional): Launch Electron Desktop Window (Terminal 3)
+bash
+npm run electron
+🖐️ Gesture Guide Reference
+Gesture	Action	Description
+☝️ Index Finger Up	Cursor Move	Tracks index finger tip and maps active bounds to full screen.
+🤏 Index + Thumb Pinch	Left Click	Hold pinch for 5 frames to trigger OS left click.
+🤙 Thumb + Pinky Out	Right Click	Triggers OS right click context menu.
+✌️ Index + Middle Up	Scroll Up / Down	Move hand up or down to scroll pages.
+🔧 Troubleshooting Tips
+Cursor Stuck at Screen Edge: Ensure WebcamView.jsx uses the active mapping bounding range (normX / normY) to map camera view to screen.width and screen.height.
+Status Disconnected: Ensure node server/index.js is running on port 3001.
+Browser Background Tab Throttling: Modern browsers pause camera loops in background tabs. To keep mouse tracking active while switching tabs, drag the Virtual Mouse tab out into its own separate window (Move to New Window).
+Kya aap chahte hain ki main iss README file ko aapke project root /home/aadesh/Desktop/virtual_mouse/README.md mein write kar doon?

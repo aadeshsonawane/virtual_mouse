@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3001");
+const socket = io("http://localhost:3001", {
+  transports: ["websocket", "polling"],
+  reconnection: true
+});
+
 
 const WebcamView = () => {
   const videoRef = useRef(null);
@@ -17,10 +21,24 @@ const WebcamView = () => {
   const screenW = window.screen.width;
   const screenH = window.screen.height;
 
-  useEffect(() => {
-    socket.on("connect", () => setConnected(true));
-    socket.on("disconnect", () => setConnected(false));
+    useEffect(() => {
+    // Check if socket is already connected before component mounted
+    if (socket.connected) {
+      setConnected(true);
+    }
+
+    const handleConnect = () => setConnected(true);
+    const handleDisconnect = () => setConnected(false);
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+    };
   }, []);
+
 
   const fingersUp = (landmarks) => {
     const fingers = [];
@@ -51,7 +69,7 @@ const WebcamView = () => {
     });
 
     // ☝️ Index only = MOVE
-        // ☝️ Index finger up = MOVE
+        
     if (fingers[1] === 1 && fingers[2] === 0) {
       const rawX = landmarks[8].x;
       const rawY = landmarks[8].y;
@@ -128,9 +146,10 @@ const WebcamView = () => {
         hands.setOptions({
           maxNumHands: 1,
           modelComplexity: 1,
-          minDetectionConfidence: 0.85,
-          minTrackingConfidence: 0.85,
+          minDetectionConfidence: 0.5,
+          minTrackingConfidence: 0.5,
         });
+
         hands.onResults(onResults);
         const camera = new window.Camera(videoRef.current, {
           onFrame: async () => {

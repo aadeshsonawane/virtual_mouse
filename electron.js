@@ -4,7 +4,10 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const robot = require('@jitsi/robotjs')
 const path = require('path')
 
-app.commandLine.appendSwitch('disable-gpu')
+// Enable WebGL & GPU Features
+app.commandLine.appendSwitch('ignore-gpu-blocklist')
+app.commandLine.appendSwitch('enable-gpu-rasterization')
+app.commandLine.appendSwitch('enable-webgl')
 app.commandLine.appendSwitch('no-sandbox')
 app.commandLine.appendSwitch('disable-dev-shm-usage')
 app.commandLine.appendSwitch('disable-setuid-sandbox')
@@ -23,9 +26,12 @@ app.whenReady().then(() => {
       nodeIntegration: false,
       sandbox: false,  
       contextIsolation: true,
+      webgl: true,
+      experimentalFeatures: true,
       preload: path.join(__dirname, 'preload.js')
     }
   })
+
 
    mainWindow.webContents.session.setPermissionRequestHandler(
     (webContents, permission, callback) => {
@@ -37,7 +43,7 @@ app.whenReady().then(() => {
     }
   )
 
-  mainWindow.loadURL('http://localhost:5174')
+  mainWindow.loadURL('http://localhost:5173')
   mainWindow.webContents.openDevTools()
 })
 

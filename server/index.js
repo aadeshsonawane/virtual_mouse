@@ -17,7 +17,7 @@ io.on('connection', (socket) => {
   console.log('React connected!')
 
   socket.on('move-mouse', ({ x, y }) => {
-     robot.moveMouse(1366 - x, y) 
+     robot.moveMouse(x, y) 
   })
 
   socket.on('click-mouse', () => {
@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
 })
 
 socket.on('mouse-down', ({ x, y }) => {
-  robot.moveMouse(x, y)
+  robot.moveMouse(1366-x, y)
   robot.mouseToggle('down', 'left')
 })
 
